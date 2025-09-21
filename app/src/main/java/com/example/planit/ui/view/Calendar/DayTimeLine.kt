@@ -2,6 +2,12 @@ package com.example.planit.ui.view.Calendar
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -77,19 +83,52 @@ fun arrangeEvents(events: List<CalendarEvent>): List<PositionedEvent> {
     return positioned.map { it.copy(totalColumns = columns.size) }
 }
 
-// ----------- UI ----------
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DayTimeline(
     date: LocalDate,
     events: List<CalendarEvent>,
     modifier: Modifier = Modifier,
-    hourHeight: Dp = 80.dp,      // height per hour
-    timeColumnWidth: Dp = 50.dp,  // width of left column
+    hourHeight: Dp = 80.dp,
+    timeColumnWidth: Dp = 50.dp,
+    onEventLongPress: (CalendarEvent) -> Unit
+) {
+    AnimatedContent(
+        targetState = date,
+        transitionSpec = {
+            if (targetState > initialState) {
+                slideInHorizontally { it } + fadeIn() togetherWith
+                        slideOutHorizontally { -it } + fadeOut()
+            } else {
+                slideInHorizontally { -it } + fadeIn() togetherWith
+                        slideOutHorizontally { it } + fadeOut()
+            }
+        },
+        label = "Day switch animation"
+    ) { currentDate ->
+        TimelineContent(
+            date = currentDate,
+            events = events,
+            modifier = modifier,
+            hourHeight = hourHeight,
+            timeColumnWidth = timeColumnWidth,
+            onEventLongPress = onEventLongPress
+        )
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+private fun TimelineContent(
+    date: LocalDate,
+    events: List<CalendarEvent>,
+    modifier: Modifier = Modifier,
+    hourHeight: Dp = 80.dp,
+    timeColumnWidth: Dp = 50.dp,
     onEventLongPress: (CalendarEvent) -> Unit
 ) {
     val hours = (0..23)
-    val scrollState = rememberScrollState() // ✅ dùng chung 1 scrollState
+    val scrollState = rememberScrollState()
 
     val minuteHeight = remember(hourHeight) { hourHeight / 60f }
     val totalHeight = hourHeight * 24f
@@ -97,15 +136,16 @@ fun DayTimeline(
 
     val positionedEvents = arrangeEvents(events)
 
-    Row(modifier = modifier
-        .fillMaxSize()
-        .padding(top = 20.dp)) {
-
+    Row(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(top = 20.dp)
+    ) {
         // ---------- LEFT TIME COLUMN ----------
         Column(
             modifier = Modifier
                 .width(timeColumnWidth)
-                .verticalScroll(scrollState) // ✅ cùng scrollState với timeline
+                .verticalScroll(scrollState)
                 .padding(top = 2.dp, start = 2.dp)
         ) {
             hours.forEach { h ->
@@ -127,7 +167,7 @@ fun DayTimeline(
         Box(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(scrollState) // ✅ dùng cùng scrollState
+                .verticalScroll(scrollState)
                 .padding(vertical = 4.dp)
         ) {
             BoxWithConstraints(
@@ -178,7 +218,7 @@ fun DayTimeline(
                     val topOffsetPx = with(density) { (minuteHeight * startMinutes).toPx() }
                     val heightPx = with(density) { (minuteHeight * durationMin).toPx() }
 
-                    val bgColor = Color(event.colorArgb) ?: Color(0xFFFFB3B3)
+                    val bgColor = Color(event.colorArgb)
                     val bgWithAlpha = bgColor.copy(alpha = 0.2f)
 
                     val widthFraction = 1f / pe.totalColumns
@@ -202,9 +242,7 @@ fun DayTimeline(
                             .padding(8.dp)
                             .pointerInput(event) {
                                 detectTapGestures(
-                                    onLongPress = {
-                                        onEventLongPress(event)
-                                    }
+                                    onLongPress = { onEventLongPress(event) }
                                 )
                             }
                     ) {
@@ -232,9 +270,7 @@ fun DayTimeline(
                                 Spacer(modifier = Modifier.height(6.dp))
                                 val startText = String.format("%02d:%02d", startMinutes / 60, startMinutes % 60)
                                 val endText = String.format("%02d:%02d", endMinutes / 60, endMinutes % 60)
-                                Row (
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
                                         painter = painterResource(R.drawable.ic_time),
                                         contentDescription = null,
@@ -251,7 +287,6 @@ fun DayTimeline(
                             }
                         }
                     }
-
                 }
 
                 // 3) Current time line
@@ -298,9 +333,6 @@ fun DayTimeline(
         }
     }
 }
-
-
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true, widthDp = 400, heightDp = 4500)
