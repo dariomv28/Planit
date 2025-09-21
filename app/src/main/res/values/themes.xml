@@ -2,13 +2,5 @@
 <resources>
 
     <style name="Theme.Planit" parent="android:Theme.Material.Light.NoActionBar" />
-    <style name="CustomDatePickerTheme" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
-        <item name="colorAccent">#FFE88181</item>
-        <item name="android:colorAccent">#FFE88181</item>
-    </style>
 
-    <style name="CustomTimePickerTheme" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
-        <item name="colorAccent">#FFE88181</item>
-        <item name="android:colorAccent">#FFE88181</item>
-    </style>
 </resources>

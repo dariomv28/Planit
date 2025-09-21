@@ -39,7 +39,8 @@ class CalendarRepository @Inject constructor(
                                 ?.let { LocalDateTime.parse(it, dateTimeFormatter) },
                             end = doc.getString("end")
                                 ?.let { LocalDateTime.parse(it, dateTimeFormatter) },
-                            remindMe = doc.getBoolean("remindMe") ?: false
+                            remindMe = doc.getBoolean("remindMe") ?: false,
+                            colorArgb = (doc.getLong("colorArgb") ?: 0).toInt()
                         )
                     } catch (ex: Exception) {
                         Log.w("Firestore", "Error parsing document ${doc.id}", ex)
@@ -56,7 +57,8 @@ class CalendarRepository @Inject constructor(
             "title" to event.title,
             "start" to event.start?.format(dateTimeFormatter),
             "end" to event.end?.format(dateTimeFormatter),
-            "remindMe" to event.remindMe
+            "remindMe" to event.remindMe,
+            "colorArgb" to event.colorArgb
         )
         db.collection("CalendarEvents")
             .get()
@@ -97,7 +99,8 @@ class CalendarRepository @Inject constructor(
             "title" to updatedEvent.title,
             "start" to updatedEvent.start?.format(dateTimeFormatter),
             "end" to updatedEvent.end?.format(dateTimeFormatter),
-            "remindMe" to updatedEvent.remindMe
+            "remindMe" to updatedEvent.remindMe,
+            "colorArgb" to updatedEvent.colorArgb
         )
 
         db.collection("CalendarEvents")

@@ -47,7 +47,7 @@ fun CustomToggleButton(
 
 
     val trackColor by animateColorAsState(
-        targetValue = if (checked) Color(0xFFE88181).copy(alpha = 0.5f)
+        targetValue = if (checked) Color.Green.copy(alpha = 0.5f)
         else Color.Gray.copy(alpha = 0.3f),
         animationSpec = tween(
             durationMillis = 300,
@@ -61,7 +61,7 @@ fun CustomToggleButton(
             .width(trackWidth)
             .height(trackHeight)
             .clip(RoundedCornerShape(50))
-            .background(trackColor) // dùng màu animate
+            .background(trackColor)
             .clickable (
 //                interactionSource = remember { MutableInteractionSource() },
 //                indication = rememberRipple(bounded = false, radius = 20.dp)

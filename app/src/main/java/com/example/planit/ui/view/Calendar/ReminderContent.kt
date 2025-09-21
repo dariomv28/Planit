@@ -95,7 +95,7 @@ fun ReminderCard(event: CalendarEvent) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFFE88181))
+            .background(Color.Gray)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

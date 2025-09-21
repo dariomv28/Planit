@@ -75,7 +75,6 @@ fun CreateEventContent(
         val calendar = Calendar.getInstance()
         TimePickerDialog(
             context,
-            R.style.CustomTimePickerTheme,
             { _, h, m -> onTimeSelected(String.format("%02d:%02d", h, m)) },
             calendar.get(Calendar.HOUR_OF_DAY),
             calendar.get(Calendar.MINUTE),
@@ -87,7 +86,6 @@ fun CreateEventContent(
         val calendar = Calendar.getInstance()
         DatePickerDialog(
             context,
-            R.style.CustomDatePickerTheme,
             { _, y, m, d -> onDateSelected(LocalDate.of(y, m + 1, d)) },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -167,8 +165,8 @@ fun CreateEventContent(
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        focusedContainerColor = Color(0xFFFF5722).copy(alpha = 0.2f),
-                        unfocusedContainerColor = Color(0xFFFF5722).copy(alpha = 0.2f),
+                        focusedContainerColor = Color.LightGray,
+                        unfocusedContainerColor = Color.LightGray,
                         focusedTextColor = Color.Black,
                         unfocusedTextColor = Color.Gray
                     )
@@ -178,11 +176,11 @@ fun CreateEventContent(
                     onClick = { showDatePicker { selectedDate = it } },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, Color(0xFFFF5722))
+                    border = BorderStroke(1.dp, Color.Red)
                 ) {
-                    Icon(Icons.Default.DateRange, contentDescription = null, tint = Color(0xFFFF5722))
+                    Icon(Icons.Default.DateRange, contentDescription = null, tint = Color.Red)
                     Spacer(Modifier.width(8.dp))
-                    Text("Date: $selectedDate", fontWeight = FontWeight.Medium, color = Color(0xFFFF5722))
+                    Text("Date: $selectedDate", fontWeight = FontWeight.Medium, color = Color.Red)
                 }
 
 
@@ -194,30 +192,30 @@ fun CreateEventContent(
                         onClick = { showTimePicker { startTime = it } },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, Color(0xFFFF5722))
+                        border = BorderStroke(1.dp, Color.Red)
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_time),
                             contentDescription = null,
-                            tint = Color(0xFFFF5722)
+                            tint = Color.Red
                         )
                         Spacer(Modifier.width(8.dp))
-                        Text("Start: $startTime", fontWeight = FontWeight.Medium, color = Color(0xFFFF5722))
+                        Text("Start: $startTime", fontWeight = FontWeight.Medium, color = Color.Red)
                     }
 
                     OutlinedButton(
                         onClick = { showTimePicker { endTime = it } },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, Color(0xFFFF5722))
+                        border = BorderStroke(1.dp, Color.Red)
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_time),
                             contentDescription = null,
-                            tint = Color(0xFFFF5722)
+                            tint = Color.Red
                         )
                         Spacer(Modifier.width(8.dp))
-                        Text("End: $endTime", fontWeight = FontWeight.Medium, color = Color(0xFFFF5722))
+                        Text("End: $endTime", fontWeight = FontWeight.Medium, color = Color.Red)
                     }
                 }
                 HorizontalDivider(
@@ -307,7 +305,7 @@ fun ThemeSelector(
                         .clip(CircleShape)
                         .background(color)
                         .border(
-                            width = if (selectedColor == color) 3.dp else 1.dp,
+                            width = 1.dp,
                             color = if (selectedColor == color) Color.Black else Color.Gray,
                             shape = CircleShape
                         )

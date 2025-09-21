@@ -81,102 +81,6 @@ fun CalendarScreen(
 
     val context = LocalContext.current.applicationContext
 
-//    LaunchedEffect(eventList) {
-//        val tomorrow = LocalDate.now().plusDays(1)
-//        val startOfTomorrow = tomorrow.atStartOfDay()
-//        val startOfDayAfter = tomorrow.plusDays(1).atStartOfDay()
-//
-//        val tomorrowEvents = eventList.filter { event ->
-//            val start = event.start
-//            start != null && !start.isBefore(startOfTomorrow) && start.isBefore(startOfDayAfter)
-//        }
-//
-//        val needed = 3 - tomorrowEvents.size
-//        if (needed > 0) {
-//            showDialog = true
-//            createDate = tomorrow
-//            remainingEvents = needed
-//        } else {
-//            showDialog = false
-//        }
-//    }
-//
-//    if (showDialog && createDate != null) {
-//        Dialog(onDismissRequest = { showDialog = false }) {
-//            Box(
-//                modifier = Modifier
-//                    .clip(RoundedCornerShape(20.dp))
-//                    .background(Color.White)
-//                    .padding(20.dp)
-//                    .width(300.dp),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//                    Icon(
-//                        imageVector = Icons.Default.DateRange,
-//                        contentDescription = null,
-//                        tint = Color(0xFFE88181),
-//                        modifier = Modifier.size(48.dp)
-//                    )
-//                    Spacer(Modifier.height(12.dp))
-//                    Text(
-//                        "Please schedule at least 3 events for tomorrow",
-//                        fontWeight = FontWeight.Bold,
-//                        textAlign = TextAlign.Center
-//                    )
-//                    Spacer(Modifier.height(8.dp))
-//                    Text(
-//                        "You still have $remainingEvents events needed to create on $createDate",
-//                        color = Color.Gray,
-//                        textAlign = TextAlign.Center,
-//                        modifier = Modifier.fillMaxWidth()
-//                    )
-//                    Spacer(Modifier.height(20.dp))
-//
-//                    Row(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        horizontalArrangement = Arrangement.SpaceEvenly
-//                    ) {
-//                        val buttonShape = RoundedCornerShape(8.dp)
-//                        val buttonWidth = 120.dp
-//                        val buttonHeight = 48.dp
-//
-//                        TextButton(
-//                            onClick = { showDialog = false },
-//                            modifier = Modifier
-//                                .width(buttonWidth)
-//                                .height(buttonHeight)
-//                                .border(
-//                                    width = 1.dp,
-//                                    color = Color(0xFFE88181).copy(alpha = 0.5f),
-//                                    shape = buttonShape
-//                                ),
-//                            shape = buttonShape,
-//                            contentPadding = PaddingValues(0.dp)
-//                        ) {
-//                            Text("Cancel", color = Color.Gray)
-//                        }
-//
-//                        Button(
-//                            onClick = {
-//                                showDialog = false
-//                                selectedScreen = CalendarScreens.CREATE_EVENT
-//                            },
-//                            modifier = Modifier
-//                                .width(buttonWidth)
-//                                .height(buttonHeight),
-//                            shape = buttonShape,
-//                            contentPadding = PaddingValues(0.dp),
-//                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE88181).copy(alpha = 0.5f))
-//                        ) {
-//                            Text("Create", color = Color.White)
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-
     if (showEventOptionsDialog && selectedEvent != null) {
         Dialog(onDismissRequest = { showEventOptionsDialog = false }) {
             Box(
@@ -191,7 +95,7 @@ fun CalendarScreen(
                     Icon(
                         painter = painterResource(R.drawable.ic_info),
                         contentDescription = null,
-                        tint = Color(0xFFE88181),
+                        tint = Color.Blue,
                         modifier = Modifier.size(48.dp)
                     )
                     Spacer(Modifier.height(12.dp))
@@ -250,7 +154,7 @@ fun CalendarScreen(
                                 .height(buttonHeight),
                             shape = buttonShape,
                             contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE88181).copy(alpha = 0.5f))
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
                         ) {
                             Text("Edit", color = Color.White)
                         }
