@@ -5,17 +5,18 @@ import android.app.TimePickerDialog
 import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -23,10 +24,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,9 +43,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.*
-import kotlin.math.sin
-
-import com.example.planit.ui.components.CustomToggleButton
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,6 +68,8 @@ fun CreateEventContent(
         )
     }
     var remindMe by remember { mutableStateOf(initialEvent?.remindMe ?: false) }
+    var themeColor by remember { mutableStateOf(initialEvent?.colorArgb?.let { Color(it) } ?: Color(0xFFFF5722)) }
+
 
     fun showTimePicker(onTimeSelected: (String) -> Unit) {
         val calendar = Calendar.getInstance()
@@ -106,36 +105,41 @@ fun CreateEventContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextButton(onClick = onClose) {
-                            Text("Cancel", color = Color(0xFFE88181), fontWeight = FontWeight.SemiBold)
+                            Text("Cancel", color = Color(0xFFFF5722), fontWeight = FontWeight.SemiBold)
                         }
                         Text(
                             if (initialEvent != null) "Edit Event" else "New Event",
-                            color = Color(0xFFE88181),
+                            color = Color.Black,
                             fontWeight = FontWeight.Bold,
                             fontSize = 25.sp
                         )
-                        TextButton(onClick = {
-                            val (sh, sm) = startTime.split(":").map { it.toInt() }
-                            val (eh, em) = endTime.split(":").map { it.toInt() }
+                        TextButton(
+                            onClick = {
+                                val (sh, sm) = startTime.split(":").map { it.toInt() }
+                                val (eh, em) = endTime.split(":").map { it.toInt() }
 
-                            val event = CalendarEvent(
-                                title = eventName,
-                                start = LocalDateTime.of(selectedDate, LocalTime.of(sh, sm)),
-                                end = LocalDateTime.of(selectedDate, LocalTime.of(eh, em)),
-                                remindMe = remindMe
-                            )
-                            val activity = context as? ComponentActivity
-                            if (remindMe && (activity?.ensureExactAlarmPermission() == true)) {
-                                scheduleReminder(context, event)
-                            }
-                            onSave(event)
-                        }) {
+                                val event = CalendarEvent(
+                                    title = eventName,
+                                    start = LocalDateTime.of(selectedDate, LocalTime.of(sh, sm)),
+                                    end = LocalDateTime.of(selectedDate, LocalTime.of(eh, em)),
+                                    remindMe = remindMe,
+                                    colorArgb = themeColor.toArgb()
+                                )
+                                val activity = context as? ComponentActivity
+                                if (remindMe && (activity?.ensureExactAlarmPermission() == true)) {
+                                    scheduleReminder(context, event)
+                                }
+                                onSave(event)
+                            },
+                            enabled = eventName.isNotBlank()
+                        ) {
                             Text(
                                 if (initialEvent != null) "Save" else "Add",
-                                color = Color(0xFFE88181),
+                                color = if (eventName.isNotBlank()) Color(0xFFFF5722) else Color.Gray,
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
+
                     }
                 }
             )
@@ -163,8 +167,8 @@ fun CreateEventContent(
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        focusedContainerColor = Color(0xFFFFDDDD),
-                        unfocusedContainerColor = Color(0xFFFFDDDD),
+                        focusedContainerColor = Color(0xFFFF5722).copy(alpha = 0.2f),
+                        unfocusedContainerColor = Color(0xFFFF5722).copy(alpha = 0.2f),
                         focusedTextColor = Color.Black,
                         unfocusedTextColor = Color.Gray
                     )
@@ -174,11 +178,11 @@ fun CreateEventContent(
                     onClick = { showDatePicker { selectedDate = it } },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, Color(0xFFE88181))
+                    border = BorderStroke(1.dp, Color(0xFFFF5722))
                 ) {
-                    Icon(Icons.Default.DateRange, contentDescription = null, tint = Color(0xFFE88181))
+                    Icon(Icons.Default.DateRange, contentDescription = null, tint = Color(0xFFFF5722))
                     Spacer(Modifier.width(8.dp))
-                    Text("Date: $selectedDate", fontWeight = FontWeight.Medium, color = Color(0xFFE88181))
+                    Text("Date: $selectedDate", fontWeight = FontWeight.Medium, color = Color(0xFFFF5722))
                 }
 
 
@@ -190,45 +194,140 @@ fun CreateEventContent(
                         onClick = { showTimePicker { startTime = it } },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, Color(0xFFE88181))
+                        border = BorderStroke(1.dp, Color(0xFFFF5722))
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_time),
                             contentDescription = null,
-                            tint = Color(0xFFE88181)
+                            tint = Color(0xFFFF5722)
                         )
                         Spacer(Modifier.width(8.dp))
-                        Text("Start: $startTime", fontWeight = FontWeight.Medium, color = Color(0xFFE88181))
+                        Text("Start: $startTime", fontWeight = FontWeight.Medium, color = Color(0xFFFF5722))
                     }
 
                     OutlinedButton(
                         onClick = { showTimePicker { endTime = it } },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, Color(0xFFE88181))
+                        border = BorderStroke(1.dp, Color(0xFFFF5722))
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_time),
                             contentDescription = null,
-                            tint = Color(0xFFE88181)
+                            tint = Color(0xFFFF5722)
                         )
                         Spacer(Modifier.width(8.dp))
-                        Text("End: $endTime", fontWeight = FontWeight.Medium, color = Color(0xFFE88181))
+                        Text("End: $endTime", fontWeight = FontWeight.Medium, color = Color(0xFFFF5722))
                     }
                 }
-
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                )
                 // Reminds me toggle
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Reminds me", fontWeight = FontWeight.Medium, color = Color(0xFFE88181), fontSize = 18.sp)
+                    Text("Notify me", fontWeight = FontWeight.Medium, color = Color.Black, fontSize = 18.sp)
                     CustomToggleButton(checked = remindMe, onCheckedChange = { remindMe = it })
                 }
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                ThemeSelector(
+                    selectedColor = themeColor,
+                    onColorSelected = { themeColor = it }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
-
-
         }
     }
+}
+
+
+
+@Composable
+fun ThemeSelector(
+    selectedColor: Color,
+    onColorSelected: (Color) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    val colorOptions = listOf(
+        Color(0xFFFF5722), // Orange
+        Color(0xFFE91E63), // Pink
+        Color(0xFF4CAF50), // Green
+        Color(0xFF2196F3), // Blue
+        Color(0xFF9C27B0)  // Purple
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = !expanded },
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            "Theme",
+            fontWeight = FontWeight.Medium,
+            color = Color.Black,
+            fontSize = 18.sp
+        )
+
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .clip(CircleShape)
+                .background(selectedColor)
+                .border(1.dp, Color.Gray, CircleShape)
+        )
+    }
+
+    AnimatedVisibility(
+        visible = expanded,
+        enter = fadeIn(animationSpec = tween(durationMillis = 300, delayMillis = 100)) +
+                expandVertically(animationSpec = tween(durationMillis = 300, delayMillis = 100)),
+        exit = fadeOut(animationSpec = tween(durationMillis = 200)) +
+                shrinkVertically(animationSpec = tween(durationMillis = 200))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            colorOptions.forEach { color ->
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(color)
+                        .border(
+                            width = if (selectedColor == color) 3.dp else 1.dp,
+                            color = if (selectedColor == color) Color.Black else Color.Gray,
+                            shape = CircleShape
+                        )
+                        .clickable {
+                            onColorSelected(color)
+                            expanded = false
+                        }
+                )
+            }
+        }
+    }
+}
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun CreateEventContentPreview() {
+    CreateEventContent(
+        onClose = {},
+        onSave = {}
+    )
 }

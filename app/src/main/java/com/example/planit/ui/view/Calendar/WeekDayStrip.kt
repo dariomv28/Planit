@@ -66,7 +66,7 @@ fun WeekDayStrip(
         Text(
             text = headerText,
             style = MaterialTheme.typography.titleMedium,
-            color = Color(0xFFD9667B),
+            color = Color.Black,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(vertical = 8.dp)
@@ -81,7 +81,7 @@ fun WeekDayStrip(
                 Text(
                     text = label,
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color.Gray,
+                    color = Color.Black,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
@@ -111,13 +111,13 @@ fun WeekDayStrip(
                         ),
                         color = when {
                             isSelected -> Color.White
-                            isToday -> Color(0xFFD9667B)
-                            else -> Color.Gray
+                            isToday -> Color(0xFFFF5722)
+                            else -> Color.Black
                         },
                         modifier = Modifier
                             .clip(CircleShape)
                             .background(
-                                if (isSelected) Color(0xFFFFB3B3) else Color.Transparent,
+                                if (isSelected) Color(0xFFFF5722) else Color.Transparent,
                                 CircleShape
                             )
                             .clickable(
@@ -133,4 +133,14 @@ fun WeekDayStrip(
             }
         }
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview(showBackground = true)
+@Composable
+fun WeekDayStripPreview() {
+    WeekDayStrip(
+        selectedDate = LocalDate.now(),
+        onDaySelected = {}
+    )
 }

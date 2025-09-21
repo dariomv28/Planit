@@ -57,14 +57,17 @@ fun CalendarTopBar(
                     Icon(
                         painter = painterResource(R.drawable.ic_back),
                         contentDescription = null,
-                        tint = Color(0xFFE88181)
+                        tint = Color(0xFFFF5722)
                     )
                 }
 //                Spacer(modifier = Modifier.weight(1f))
                 // Custom Segmented Control
                 Row(
                     modifier = Modifier
-                        .background(Color(0xFFFDE2E2), shape = RoundedCornerShape(50))
+                        .background(
+                            shape = RoundedCornerShape(25),
+                            color = Color.Transparent
+                        )
                         .padding(2.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -82,12 +85,12 @@ fun CalendarTopBar(
                 }
 //                Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = onAddEvent) {
-                    Icon(Icons.Default.Add, contentDescription = "Close", tint = Color(0xFFE88181))
+                    Icon(Icons.Default.Add, contentDescription = "Close", tint = Color(0xFFFF5722))
                 }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.White
+            containerColor = Color.LightGray
         )
     )
 }
@@ -98,12 +101,12 @@ fun SegmentedButton(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (isSelected) Color(0xFFFFB3B3) else Color.Transparent
-    val textColor = if (isSelected) Color.White else Color(0xFFD9667B)
+    val backgroundColor = if (isSelected) Color(0xFFFF5722) else Color.Gray.copy(alpha = 0.5f)
+    val textColor = if (isSelected) Color.White else Color(0xFFFF5722)
 
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(50))
+            .clip(RoundedCornerShape(25))
             .background(backgroundColor)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -115,4 +118,14 @@ fun SegmentedButton(
     ) {
         Text(text = text, color = textColor, fontSize = 20.sp)
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TopBarPreview() {
+    CalendarTopBar(
+        onTabSelected = {},
+        onClose = {},
+        onAddEvent = {}
+    )
 }

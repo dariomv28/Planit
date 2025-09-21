@@ -7,6 +7,6 @@ data class CalendarEvent(
     val title: String? = null,
     val start: LocalDateTime? = null,
     val end: LocalDateTime? = null,
-    val colorArgb: Long? = null,
+    val colorArgb: Int = 0,
     val remindMe: Boolean = false
 )

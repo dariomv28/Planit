@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -37,6 +39,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.max
+import com.example.planit.R
 
 // ----------- Data class phụ để lưu thông tin event đã tính toán ----------
 data class PositionedEvent(
@@ -94,7 +97,9 @@ fun DayTimeline(
 
     val positionedEvents = arrangeEvents(events)
 
-    Row(modifier = modifier.fillMaxSize().padding(top = 20.dp)) {
+    Row(modifier = modifier
+        .fillMaxSize()
+        .padding(top = 20.dp)) {
 
         // ---------- LEFT TIME COLUMN ----------
         Column(
@@ -173,8 +178,8 @@ fun DayTimeline(
                     val topOffsetPx = with(density) { (minuteHeight * startMinutes).toPx() }
                     val heightPx = with(density) { (minuteHeight * durationMin).toPx() }
 
-                    val bgColor = event.colorArgb?.let { Color(it) } ?: Color(0xFFFFB3B3)
-                    val bgWithAlpha = bgColor.copy(alpha = 0.7f)
+                    val bgColor = Color(event.colorArgb) ?: Color(0xFFFFB3B3)
+                    val bgWithAlpha = bgColor.copy(alpha = 0.2f)
 
                     val widthFraction = 1f / pe.totalColumns
                     val xOffsetFraction = pe.column * widthFraction
@@ -195,7 +200,7 @@ fun DayTimeline(
                             .clip(RoundedCornerShape(8.dp))
                             .background(bgWithAlpha)
                             .padding(8.dp)
-                            .pointerInput(event){
+                            .pointerInput(event) {
                                 detectTapGestures(
                                     onLongPress = {
                                         onEventLongPress(event)
@@ -203,24 +208,50 @@ fun DayTimeline(
                                 )
                             }
                     ) {
-                        Column {
-                            Text(
-                                text = event.title ?: "(No title)",
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 2
+                        Row(modifier = Modifier.fillMaxSize()) {
+                            // Thanh dọc ở bên trái
+                            Box(
+                                modifier = Modifier
+                                    .width(4.dp)
+                                    .fillMaxHeight()
+                                    .background(bgColor, RoundedCornerShape(2.dp))
                             )
-                            Spacer(modifier = Modifier.height(6.dp))
-                            val startText = String.format("%02d:%02d", startMinutes / 60, startMinutes % 60)
-                            val endText = String.format("%02d:%02d", endMinutes / 60, endMinutes % 60)
-                            Text(
-                                text = "$startText — $endText",
-                                color = Color.White,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 12.sp
-                            )
+
+                            Spacer(modifier = Modifier.width(6.dp))
+
+                            // Nội dung event
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = event.title ?: "(No title)",
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.W500,
+                                    maxLines = 2
+                                )
+                                Spacer(modifier = Modifier.height(6.dp))
+                                val startText = String.format("%02d:%02d", startMinutes / 60, startMinutes % 60)
+                                val endText = String.format("%02d:%02d", endMinutes / 60, endMinutes % 60)
+                                Row (
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_time),
+                                        contentDescription = null,
+                                        tint = bgColor,
+                                        modifier = Modifier.size(12.dp)
+                                    )
+                                    Text(
+                                        text = "$startText — $endText",
+                                        color = bgColor,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
                         }
                     }
+
                 }
 
                 // 3) Current time line
@@ -251,7 +282,7 @@ fun DayTimeline(
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(Color(0xFFD9667B))
+                                .background(Color(0xFFFF5722))
                                 .padding(horizontal = 10.dp, vertical = 6.dp)
                         ) {
                             Text(
@@ -266,4 +297,56 @@ fun DayTimeline(
             }
         }
     }
+}
+
+
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview(showBackground = true, widthDp = 400, heightDp = 4500)
+@Composable
+fun DayTimelinePreview() {
+    val today = LocalDate.now()
+
+    val mockEvents = listOf(
+        CalendarEvent(
+            id = "1",
+            title = "Morning Meeting",
+            start = LocalDateTime.of(today, LocalTime.of(9, 0)),
+            end = LocalDateTime.of(today, LocalTime.of(10, 0)),
+            remindMe = true,
+            colorArgb = 0xFFE57373.toInt() // đỏ nhạt
+        ),
+        CalendarEvent(
+            id = "2",
+            title = "Work Session",
+            start = LocalDateTime.of(today, LocalTime.of(9, 30)),
+            end = LocalDateTime.of(today, LocalTime.of(11, 30)),
+            remindMe = false,
+            colorArgb = 0xFF64B5F6.toInt() // xanh
+        ),
+        CalendarEvent(
+            id = "3",
+            title = "Lunch Break",
+            start = LocalDateTime.of(today, LocalTime.of(12, 0)),
+            end = LocalDateTime.of(today, LocalTime.of(13, 0)),
+            remindMe = false,
+            colorArgb = 0xFF81C784.toInt() // xanh lá
+        ),
+        CalendarEvent(
+            id = "4",
+            title = "Team Sync",
+            start = LocalDateTime.of(today, LocalTime.of(14, 0)),
+            end = LocalDateTime.of(today, LocalTime.of(15, 30)),
+            remindMe = true,
+            colorArgb = 0xFFFFB74D.toInt()
+        )
+    )
+
+    DayTimeline(
+        date = today,
+        events = mockEvents,
+        modifier = Modifier.fillMaxSize(),
+        onEventLongPress = { e -> println("Long pressed: ${e.title}") }
+    )
 }
